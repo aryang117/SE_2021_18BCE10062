@@ -18,7 +18,7 @@ public:
         }
     }
 
-    void updateBoard(unordered_map<int, vector<int>> locs, int playerID)
+    void updateBoard(unordered_map<string, vector<int>> locs, int playerID)
     {
 
         char playerName = playerID == 1 ? 'A' : 'B';
@@ -26,17 +26,16 @@ public:
         for (auto i : locs)
         {
             boardLayout[i.second[0]][i.second[1]] = playerName + i.first;
-            cout << "updatedLoc";
         }
     }
 
     void printBoard()
     {
-        for (vector<string> i : boardLayout)
+        for (int i = 0; i < boardLayout.size(); i++)
         {
-            for (auto j : i)
+            for (int j = 0; j < boardLayout[i].size(); j++)
             {
-                cout << j << "\t";
+                cout << boardLayout[i][j] << "\t";
             }
             cout << "\n";
         }
@@ -49,12 +48,12 @@ class player
     int playerID;
 
 public:
-
     player(int id)
     {
         playerID = id;
     }
-    void setInitLoc(vector<string> loc, board b)
+
+    unordered_map<string, vector<int>> setInitLoc(vector<string> loc, board b)
     {
 
         int locX = playerID == 1 ? 0 : 4;
@@ -64,9 +63,10 @@ public:
             pawns[loc[i]].push_back(locX);
             pawns[loc[i]].push_back(i);
         }
+
+        return pawns;
     }
 };
-
 
 int main()
 {
@@ -83,7 +83,16 @@ int main()
         initLocation.push_back(loc);
     }
 
-    P1.setInitLoc(initLocation, b);
+    b.updateBoard(P1.setInitLoc(initLocation, b), 1);
+    b.printBoard();
+
+    for (int i = 0; i < 5; i++)
+    {
+        cin >> loc;
+        initLocation.push_back(loc);
+    }
+
+    b.updateBoard(P2.setInitLoc(initLocation, b), 2);
     b.printBoard();
 
     return 0;
