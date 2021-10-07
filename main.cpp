@@ -29,9 +29,9 @@ public:
         }
     }
 
-    void updateBoardMove(unordered_map<string, vector<int>> P1locs, unordered_map<string, vector<int>> P2locs)
+    string updateBoardMove(unordered_map<string, vector<int>> P1locs, unordered_map<string, vector<int>> P2locs, char moveBy)
     {
-
+        // cleaning the board
         for (int i = 0; i < boardLayout.size(); i++)
         {
             for (int j = 0; j < boardLayout[i].size(); j++)
@@ -40,6 +40,17 @@ public:
             }
         }
 
+        string dedChar = "na";
+
+        // check if the a player's pawn dies
+        for (auto i : P1locs)
+        {
+            for (auto j : P2locs)
+                if (i.second[0] == j.second[0] && i.second[1] == j.second[1])
+                    dedChar = moveBy == 'A' ? 'B' + j.first : 'A' + i.first;
+        }
+
+        // updating the board
         for (auto i : P1locs)
         {
             boardLayout[i.second[0]][i.second[1]] = 'A' + i.first;
@@ -49,6 +60,8 @@ public:
         {
             boardLayout[i.second[0]][i.second[1]] = 'B' + i.first;
         }
+
+        return dedChar;
     }
 
     void printBoard()
@@ -68,6 +81,7 @@ class player
 {
     unordered_map<string, vector<int>> pawns;
     int playerID;
+    int pawnLeft;
 
 public:
     player(int id)
@@ -86,13 +100,18 @@ public:
             pawns[loc[i]].push_back(i);
         }
 
+        pawnLeft = 5;
         return pawns;
     }
 
     unordered_map<string, vector<int>> getPlayerLoc()
     {
-
         return pawns;
+    }
+
+    int getNoOfPawnsLeft()
+    {
+        return pawnLeft;
     }
 
     unordered_map<string, vector<int>> setPlayerMove(string pawnID, char move)
@@ -113,6 +132,13 @@ public:
             break;
         }
         return pawns;
+    }
+
+    void updatePawnStatus(string pawnID)
+    {
+        pawnLeft--;
+
+        pawns.erase(pawnID);
     }
 };
 
@@ -147,8 +173,13 @@ int main()
     string playerMove;
     cin >> playerMove;
 
-    b.updateBoardMove(P1.setPlayerMove(playerMove.substr(0, 2), playerMove[playerMove.size() - 1]), P2.getPlayerLoc());
+    string updates = b.updateBoardMove(P1.setPlayerMove(playerMove.substr(0, 2), playerMove[playerMove.size() - 1]), P2.getPlayerLoc(), 'A');
 
-    b.printBoard();
+    if (updates != "na")
+        if (updates[0] == 'A')
+            P1.updatePawnStatus(updates.substr(1, 2));
+
+    cout << P1.getNoOfPawnsLeft();
+
     return 0;
 }
