@@ -18,7 +18,7 @@ public:
         }
     }
 
-    void updateBoard(unordered_map<string, vector<int>> locs, int playerID)
+    void updateBoardInit(unordered_map<string, vector<int>> locs, int playerID)
     {
 
         char playerName = playerID == 1 ? 'A' : 'B';
@@ -26,6 +26,28 @@ public:
         for (auto i : locs)
         {
             boardLayout[i.second[0]][i.second[1]] = playerName + i.first;
+        }
+    }
+
+    void updateBoardMove(unordered_map<string, vector<int>> P1locs, unordered_map<string, vector<int>> P2locs)
+    {
+
+        for (int i = 0; i < boardLayout.size(); i++)
+        {
+            for (int j = 0; j < boardLayout[i].size(); j++)
+            {
+                boardLayout[i][j] = "-";
+            }
+        }
+
+        for (auto i : P1locs)
+        {
+            boardLayout[i.second[0]][i.second[1]] = 'A' + i.first;
+        }
+
+        for (auto i : P2locs)
+        {
+            boardLayout[i.second[0]][i.second[1]] = 'B' + i.first;
         }
     }
 
@@ -53,7 +75,7 @@ public:
         playerID = id;
     }
 
-    unordered_map<string, vector<int>> setInitLoc(vector<string> loc, board b)
+    unordered_map<string, vector<int>> setInitLoc(vector<string> loc)
     {
 
         int locX = playerID == 1 ? 0 : 4;
@@ -64,6 +86,32 @@ public:
             pawns[loc[i]].push_back(i);
         }
 
+        return pawns;
+    }
+
+    unordered_map<string, vector<int>> getPlayerLoc()
+    {
+
+        return pawns;
+    }
+
+    unordered_map<string, vector<int>> setPlayerMove(string pawnID, char move)
+    {
+        switch (move)
+        {
+        case 'F':
+            pawns[pawnID][0]++;
+            break;
+        case 'B':
+            pawns[pawnID][0]--;
+            break;
+        case 'L':
+            pawns[pawnID][1]++;
+            break;
+        case 'R':
+            pawns[pawnID][1]--;
+            break;
+        }
         return pawns;
     }
 };
@@ -83,17 +131,24 @@ int main()
         initLocation.push_back(loc);
     }
 
-    b.updateBoard(P1.setInitLoc(initLocation, b), 1);
+    b.updateBoardInit(P1.setInitLoc(initLocation), 1);
     b.printBoard();
 
+    cout << "Player 2 input:";
     for (int i = 0; i < 5; i++)
     {
         cin >> loc;
         initLocation.push_back(loc);
     }
 
-    b.updateBoard(P2.setInitLoc(initLocation, b), 2);
+    b.updateBoardInit(P2.setInitLoc(initLocation), 2);
     b.printBoard();
 
+    string playerMove;
+    cin >> playerMove;
+
+    b.updateBoardMove(P1.setPlayerMove(playerMove.substr(0, 2), playerMove[playerMove.size() - 1]), P2.getPlayerLoc());
+
+    b.printBoard();
     return 0;
 }
